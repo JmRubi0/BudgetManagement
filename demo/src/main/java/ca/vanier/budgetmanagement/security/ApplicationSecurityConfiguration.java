@@ -5,13 +5,14 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.core.userdetails.User;
+
+import ca.vanier.budgetmanagement.repository.UserRepository;
+
 import org.springframework.security.config.Customizer;
  
 @Configuration
@@ -28,6 +29,8 @@ public class ApplicationSecurityConfiguration {
                 .requestMatchers("/index.html", "/greeting").permitAll()
                 .requestMatchers("/h2-console/**").permitAll()
                 .requestMatchers("/users/register").permitAll()
+                .requestMatchers("/budget/**").hasRole("USER")
+                .requestMatchers("/admin/**").hasRole("ADMIN")
                 .anyRequest().authenticated())
             .userDetailsService(userDetailsService)
             .httpBasic(Customizer.withDefaults())
@@ -37,12 +40,16 @@ public class ApplicationSecurityConfiguration {
     }
 
     @Bean
-    public UserDetailsService userDetailsService(PasswordEncoder passwordEncoder) {
-        UserDetails user = User.withUsername("student")
-                .password(passwordEncoder.encode("password"))
-                .roles("USER")
+    public UserDetailsService userDetailsService(PasswordEncoder passwordEncoder, UserRepository userRepository) {
+        return username -> {
+            ca.vanier.budgetmanagement.entities.User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+ 
+            return org.springframework.security.core.userdetails.User.withUsername(user.getUsername())
+                .password(user.getPassword())
+                .roles(user.getRole().toUpperCase())
                 .build();
-        return new InMemoryUserDetailsManager(user);
+        };
     }
 
     @Bean

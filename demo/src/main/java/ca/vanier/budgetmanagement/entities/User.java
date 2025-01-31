@@ -3,6 +3,8 @@ package ca.vanier.budgetmanagement.entities;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -24,6 +26,9 @@ public class User {
     private String role;
 
     // Table relations
-    @OneToMany(mappedBy = "owner")  // Changed from "user" to "owner"
+    @OneToMany(mappedBy = "owner")
+    @JsonIgnore
     private List<Transaction> transactions = new ArrayList<>();
+
+ 
 }
