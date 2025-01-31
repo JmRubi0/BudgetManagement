@@ -4,6 +4,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -20,15 +21,13 @@ public class ApplicationSecurityConfiguration {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, UserDetailsService userDetailsService) throws Exception {
         http
-            // Disable CSRF for H2 Console
-            .csrf(csrf -> csrf
-                .ignoringRequestMatchers("/h2-console/**"))
-            // Configure headers to allow H2 Console frame
+            .csrf(AbstractHttpConfigurer::disable)
             .headers(headers -> headers
                 .frameOptions(frameOptions -> frameOptions.sameOrigin()))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/index.html", "/greeting").permitAll()
                 .requestMatchers("/h2-console/**").permitAll()
+                .requestMatchers("/users/register").permitAll()
                 .anyRequest().authenticated())
             .userDetailsService(userDetailsService)
             .httpBasic(Customizer.withDefaults())
