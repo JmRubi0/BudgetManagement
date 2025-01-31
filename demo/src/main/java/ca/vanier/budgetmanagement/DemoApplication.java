@@ -1,4 +1,4 @@
-package ca.vanier.budgetmanagement.demo;
+package ca.vanier.budgetmanagement;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
