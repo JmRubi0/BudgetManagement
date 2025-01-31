@@ -1,5 +1,7 @@
 package ca.vanier.budgetmanagement.service;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,5 +28,10 @@ public class BudgetService {
 
     public Transaction createTransaction(Transaction transaction) {
         return transactionRepository.save(transaction);
+    }
+
+    //ADMIN funcitonalities
+    public List<BudgetCategory> getAllBudgets(){
+            return categoryRepository.findAll();       
     }
 }
