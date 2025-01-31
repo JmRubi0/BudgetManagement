@@ -7,20 +7,20 @@ import ca.vanier.budgetmanagement.entities.BudgetCategory;
 import ca.vanier.budgetmanagement.entities.Transaction;
 import ca.vanier.budgetmanagement.repository.BudgetCategoryRepository;
 import ca.vanier.budgetmanagement.repository.TransactionRepository;
+import jakarta.transaction.Transactional;
 
 
 //Create and save budget categories and transactions
 //When the method is called, it adds them to the database
 @Service
+@Transactional
 public class BudgetService {
     @Autowired
     private BudgetCategoryRepository categoryRepository;
     @Autowired
     private TransactionRepository transactionRepository;
 
-    public BudgetCategory createCategory(String name) {
-        BudgetCategory category = new BudgetCategory();
-        category.setName(name);
+    public BudgetCategory createCategory(BudgetCategory category) {
         return categoryRepository.save(category);
     }
 
