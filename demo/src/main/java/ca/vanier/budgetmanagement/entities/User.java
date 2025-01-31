@@ -1,5 +1,6 @@
 package ca.vanier.budgetmanagement.entities;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.persistence.Entity;
@@ -10,9 +11,10 @@ import jakarta.persistence.OneToMany;
 import lombok.Getter;
 import lombok.Setter;
 
+//User Table
 @Getter
 @Setter
-@Entity
+@Entity(name = "users")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,8 +23,7 @@ public class User {
     private String password;
     private String role;
 
-    //Table relations
-    @OneToMany(mappedBy = "user")
-    private List<Transaction> transaction;
-
+    // Table relations
+    @OneToMany(mappedBy = "owner")  // Changed from "user" to "owner"
+    private List<Transaction> transactions = new ArrayList<>();
 }
