@@ -11,7 +11,7 @@ import jakarta.persistence.OneToMany;
 import lombok.Getter;
 import lombok.Setter;
 
-//user Table
+//BudgetCategory Table
 @Getter
 @Setter
 @Entity
