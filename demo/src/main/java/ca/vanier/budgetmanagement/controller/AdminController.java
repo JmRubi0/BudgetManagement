@@ -14,9 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import ca.vanier.budgetmanagement.entities.BudgetCategory;
 import ca.vanier.budgetmanagement.entities.User;
-import ca.vanier.budgetmanagement.service.BudgetService;
 import ca.vanier.budgetmanagement.service.UserService;
 
 @RestController
@@ -26,10 +24,8 @@ public class AdminController {
  
     @Autowired
     private UserService userService;
- 
-    @Autowired
-    private BudgetService budgetService;
- 
+    
+    //Admin as control of all users
     // View all users
     @GetMapping("/users")
     public ResponseEntity<List<User>> getAllUsers() {
@@ -50,9 +46,4 @@ public class AdminController {
         return new ResponseEntity<>("User deleted successfully", HttpStatus.OK);
     }
  
-    // View all budgets of all users
-    @GetMapping("/budgets")
-    public ResponseEntity<List<BudgetCategory>> getAllBudgets() {
-        return new ResponseEntity<>(budgetService.getAllBudgets(), HttpStatus.OK);
-    }
 }
