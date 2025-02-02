@@ -17,6 +17,10 @@ import org.springframework.web.bind.annotation.RestController;
 import ca.vanier.budgetmanagement.entities.User;
 import ca.vanier.budgetmanagement.service.UserService;
 
+
+/*
+ * Admin can over see all user activity which he can promote/demote a user and delete a user
+ */
 @RestController
 @RequestMapping("/admin")
 @PreAuthorize("hasRole('ADMIN')")

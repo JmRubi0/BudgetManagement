@@ -3,14 +3,15 @@ package ca.vanier.budgetmanagement.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RestController;
 
 import ca.vanier.budgetmanagement.entities.BudgetCategory;
+import ca.vanier.budgetmanagement.entities.BudgetSummary;
 import ca.vanier.budgetmanagement.entities.Transaction;
 import ca.vanier.budgetmanagement.service.BudgetService;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -28,7 +29,6 @@ public class BudgetController {
     @Autowired
     private BudgetService budgetService;
     
-    @PreAuthorize("hasRole('USER')")
     @PostMapping("/transaction")
     public ResponseEntity<Transaction> createTransaction(@RequestBody Transaction transaction) {
         Transaction createdTransaction = budgetService.createTransaction(transaction);
@@ -37,7 +37,6 @@ public class BudgetController {
     }
     
     //Creates budgets category
-    @PreAuthorize("hasRole('USER')")
     @PostMapping("/category")
         public ResponseEntity<BudgetCategory> createCategory(@RequestBody BudgetCategory category) {
         BudgetCategory savedCategory = budgetService.createCategory(category);
@@ -56,6 +55,15 @@ public class BudgetController {
     public ResponseEntity<String> deleteCategory(@PathVariable Long id) {
         budgetService.deleteCategory(id);
         return new ResponseEntity<>("Category deleted successfully", HttpStatus.OK);
+    }
+
+    /**
+     * Loads the budget summaries
+     */
+    @GetMapping("/summary")
+        public ResponseEntity<BudgetSummary> getBudgetSummary() {
+            BudgetSummary summary = budgetService.getBudgetSummary();
+        return ResponseEntity.ok(summary);
     }
     
 }
