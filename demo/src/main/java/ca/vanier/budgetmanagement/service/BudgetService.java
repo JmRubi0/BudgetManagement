@@ -5,7 +5,9 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import ca.vanier.budgetmanagement.entities.BudgetCategory;
+import ca.vanier.budgetmanagement.entities.BudgetSummary;
 import ca.vanier.budgetmanagement.entities.Transaction;
+
 import ca.vanier.budgetmanagement.repository.BudgetCategoryRepository;
 import ca.vanier.budgetmanagement.repository.TransactionRepository;
 import jakarta.transaction.Transactional;
@@ -44,6 +46,20 @@ public class BudgetService {
             .orElseThrow(() -> new UsernameNotFoundException("User not found"));
  
             budgetCategoryRepository.delete(budgetCategory);
+    }
+
+    public BudgetSummary getBudgetSummary() {
+        double totalIncome = transactionRepository.findAll().stream()
+            .filter(t -> "income".equalsIgnoreCase(t.getType()))
+            .mapToDouble(Transaction::getAmount)
+            .sum();
+     
+        double totalExpenses = transactionRepository.findAll().stream()
+            .filter(t -> "expense".equalsIgnoreCase(t.getType()))
+            .mapToDouble(Transaction::getAmount)
+            .sum();
+     
+        return new BudgetSummary(totalIncome, totalExpenses, totalIncome - totalExpenses);
     }
 
 
