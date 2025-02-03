@@ -1,5 +1,7 @@
 package ca.vanier.budgetmanagement.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 
 /**
@@ -57,6 +60,14 @@ public class BudgetController {
         return new ResponseEntity<>("Category deleted successfully", HttpStatus.OK);
     }
 
+    //Filtering by bduget category name
+    @GetMapping("/category")
+    public ResponseEntity<List<BudgetCategory>> getCategoriesByName(@RequestParam(required = false) String name) {
+        List<BudgetCategory> categories = budgetService.getCategoriesByName(name);
+        return ResponseEntity.ok(categories);
+    }
+
+    
     /**
      * Loads the budget summaries
      */
