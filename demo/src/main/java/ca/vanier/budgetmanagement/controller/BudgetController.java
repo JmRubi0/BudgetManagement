@@ -3,10 +3,12 @@ package ca.vanier.budgetmanagement.controller;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,6 +25,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -39,6 +42,9 @@ public class BudgetController {
 
     @Autowired
     private TransactionRepository transactionRepository;
+
+    @Autowired
+    private MessageSource messageSource; 
     
     //Creates transactional expense or income
     @PostMapping("/transaction")
@@ -74,7 +80,6 @@ public class BudgetController {
 
         return groupedByType;
     }
-
     //Reprot income vs expenses
     @GetMapping("/transactions/report/{year}")
     public ResponseEntity<Map<String, Object>> getYearlyTransactionsReport(@PathVariable int year) {
@@ -82,11 +87,13 @@ public class BudgetController {
         return ResponseEntity.ok(report);
     }
     
-    //Creates budgets category
-    @PostMapping("/category")
-        public ResponseEntity<BudgetCategory> createCategory(@RequestBody BudgetCategory category) {
-        BudgetCategory savedCategory = budgetService.createCategory(category);
-        return new ResponseEntity<>(savedCategory, HttpStatus.CREATED);
+    //Creates budgets category using internationalization
+     @PostMapping("/category")
+    public ResponseEntity<String> createCategory(@RequestBody BudgetCategory category, 
+                                                 @RequestHeader(name = "Accept-Language", required = false) Locale locale) {
+        budgetService.createCategory(category);
+        String message = messageSource.getMessage("budget.created", null, locale);
+        return new ResponseEntity<>(message, HttpStatus.CREATED);
     }
 
     //Edit Budget Category
