@@ -1,6 +1,10 @@
 package ca.vanier.budgetmanagement.service;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -75,6 +79,65 @@ public class BudgetService {
         return budgetCategoryRepository.findAll(); // If no name is provided, return all categories
     }
 
+    public Map<String, List<Transaction>> getTransactionsByYearGroupedByTypeAndDate(int year) {
+        // Get all transactions for the given year
+        List<Transaction> transactions = transactionRepository.findAll().stream()
+                .filter(t -> t.getDate().getYear() == year) // Filter by year
+                .collect(Collectors.toList());
+
+        // Group transactions by type (income or expense) and date
+        Map<String, List<Transaction>> groupedByType = new HashMap<>();
+        groupedByType.put("income", new ArrayList<>());
+        groupedByType.put("expense", new ArrayList<>());
+
+        for (Transaction transaction : transactions) {
+            if ("income".equalsIgnoreCase(transaction.getType())) {
+                groupedByType.get("income").add(transaction);
+            } else if ("expense".equalsIgnoreCase(transaction.getType())) {
+                groupedByType.get("expense").add(transaction);
+            }
+        }
+
+        return groupedByType;
+    }
+
+    /**
+     * 
+     * @param year
+     * @return Report filtering by group income and expenses from the year entered
+     */
+    public Map<String, Object> getYearlyTransactionsReport(int year) {
+        Map<String, List<Transaction>> groupedTransactions = getTransactionsByYearGroupedByTypeAndDate(year);
+
+        List<Map<String, Object>> income = groupedTransactions.get("income").stream()
+                .collect(Collectors.groupingBy(t -> t.getDate().toLocalDate()))  // Group by date
+                .entrySet().stream()
+                .map(entry -> {
+                    Map<String, Object> dateIncome = new HashMap<>();
+                    dateIncome.put("date", entry.getKey().toString());
+                    dateIncome.put("amount", entry.getValue().stream().mapToDouble(Transaction::getAmount).sum());
+                    return dateIncome;
+                })
+                .collect(Collectors.toList());
+
+        List<Map<String, Object>> expenses = groupedTransactions.get("expense").stream()
+                .collect(Collectors.groupingBy(t -> t.getDate().toLocalDate()))  // Group by date
+                .entrySet().stream()
+                .map(entry -> {
+                    Map<String, Object> dateExpense = new HashMap<>();
+                    dateExpense.put("date", entry.getKey().toString());
+                    dateExpense.put("amount", entry.getValue().stream().mapToDouble(Transaction::getAmount).sum());
+                    return dateExpense;
+                })
+                .collect(Collectors.toList());
+
+        Map<String, Object> report = new HashMap<>();
+        report.put("income", income);
+        report.put("expenses", expenses);
+
+        return report;
+    }
+    
 
     /**
      * Create transaction
@@ -83,6 +146,15 @@ public class BudgetService {
      */
     public Transaction createTransaction(Transaction transaction) {
         return transactionRepository.save(transaction);
+    }
+
+    /**
+     * Reports filtering all expenses and income from entered Year
+     */
+    public List<Transaction> getTransactionsByYear(int year) {
+        return transactionRepository.findAll().stream()
+            .filter(t -> t.getDate().getYear() == year)
+            .collect(Collectors.toList());
     }
 
 }
