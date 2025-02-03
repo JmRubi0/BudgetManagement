@@ -15,10 +15,22 @@ import ca.vanier.budgetmanagement.repository.UserRepository;
 
 import org.springframework.security.config.Customizer;
  
+/**
+ * User Auth Security
+ */
 @Configuration
 @EnableWebSecurity
 public class ApplicationSecurityConfiguration {
 
+    /**
+     * from the index login to h2 console are all permitted to anyone (not necessary to be a user yet) 
+     * 
+     * To register is permitted to all
+     * 
+     * After creation of account either USER or ADMIN are able to access all endpoints with using basic auth and their crendentials on postman
+     *
+     * ADMIN only can acces the admin endpoints
+     */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, UserDetailsService userDetailsService) throws Exception {
         http
@@ -29,7 +41,7 @@ public class ApplicationSecurityConfiguration {
                 .requestMatchers("/index.html", "/greeting").permitAll()
                 .requestMatchers("/h2-console/**").permitAll()
                 .requestMatchers("/users/register").permitAll()
-                .requestMatchers("/budget/**").hasRole("USER")
+                .requestMatchers("/budget/**").hasAnyRole("USER", "ADMIN")
                 .requestMatchers("/admin/**").hasRole("ADMIN")
                 .anyRequest().authenticated())
             .userDetailsService(userDetailsService)
@@ -39,6 +51,9 @@ public class ApplicationSecurityConfiguration {
         return http.build();
     }
 
+    /*
+     * Checks user credentials if it is the correct user and password
+     */
     @Bean
     public UserDetailsService userDetailsService(PasswordEncoder passwordEncoder, UserRepository userRepository) {
         return username -> {
@@ -52,6 +67,10 @@ public class ApplicationSecurityConfiguration {
         };
     }
 
+    /**
+     * 
+     * @return Encrypted password in the database
+     */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();

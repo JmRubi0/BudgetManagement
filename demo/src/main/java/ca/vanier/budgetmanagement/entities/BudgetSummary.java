@@ -1,5 +1,9 @@
 package ca.vanier.budgetmanagement.entities;
 
+
+/**
+ * Budget Summary
+ */
 public class BudgetSummary {
     private double totalIncome;
     private double totalExpenses;

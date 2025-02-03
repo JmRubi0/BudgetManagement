@@ -1,5 +1,7 @@
 package ca.vanier.budgetmanagement.service;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -48,6 +50,10 @@ public class BudgetService {
             budgetCategoryRepository.delete(budgetCategory);
     }
 
+    /**
+     * 
+     * @return Takes all income and expense to sum up and shows remain balance
+     */
     public BudgetSummary getBudgetSummary() {
         double totalIncome = transactionRepository.findAll().stream()
             .filter(t -> "income".equalsIgnoreCase(t.getType()))
@@ -60,6 +66,13 @@ public class BudgetService {
             .sum();
      
         return new BudgetSummary(totalIncome, totalExpenses, totalIncome - totalExpenses);
+    }
+
+    public List<BudgetCategory> getCategoriesByName(String name) {
+        if (name != null && !name.isEmpty()) {
+            return budgetCategoryRepository.findByNameContainingIgnoreCase(name); // Case-insensitive search
+        }
+        return budgetCategoryRepository.findAll(); // If no name is provided, return all categories
     }
 
 
